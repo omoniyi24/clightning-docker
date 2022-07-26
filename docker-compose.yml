@@ -1,0 +1,49 @@
+version: "3"
+services:
+#  bitcoind:
+#    image: lncm/bitcoind:v22.0
+#    volumes:
+#      - ${PWD}/dev/bitcoind/bitcoin.conf:/data/.bitcoin/bitcoin.conf
+
+
+#  bitcoind:
+#    image: lncm/bitcoind:v0.21.0
+#    container_name: bitcoin
+#    volumes:
+#      - ${PWD}/dev/bitcoind/bitcoin.conf:/data/.bitcoin/bitcoin.conf
+#    restart: on-failure
+#    ports:
+#      - "8333:8333"
+#      - "8332:8332"
+#    stop_grace_period: 20m30s
+#    networks:
+#      net:
+#        ipv4_address: 10.254.2.2
+  alice-cln:
+    image: elementsproject/lightningd:latest
+    volumes:
+      - ${PWD}/dev/config:/root/.lightning/config
+      - ${PWD}/dev/log:/root/.lightning/log
+    network_mode: host
+    command:
+      --alias=jay-cln
+      --rgb=000000
+      --network=regtest
+      --log-file=./log
+      --log-level=debug
+      --fee-base=1000
+      --fee-per-satoshi=1
+      --min-capacity-sat=5000000
+      --large-channels
+      --funding-confirms=2
+      --autocleaninvoice-cycle=86400
+      --autocleaninvoice-expired-by=86400
+      --bitcoin-rpcconnect=bitcoind
+      --log-level=info:plugin-bcli
+      --bitcoin-rpcport=18443
+#    depends_on: [ bitcoind ]
+
+networks:
+  mynetwork:
+    external: true
+    name: host
